@@ -1,11 +1,420 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Document</title>
+    <title>電腦銷售管理系統</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Microsoft YaHei', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .dashboard {
+            padding: 30px;
+        }
+
+        .stats-card {
+            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 10px;
+            text-align: center;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 20px rgba(231, 76, 60, 0.3);
+        }
+
+        .stats-card h2 {
+            font-size: 1.5em;
+            margin-bottom: 10px;
+        }
+
+        .total-amount {
+            font-size: 3em;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+
+        .orders-section {
+            margin-top: 30px;
+        }
+
+        .section-title {
+            font-size: 1.8em;
+            color: #2c3e50;
+            margin-bottom: 20px;
+            border-bottom: 3px solid #3498db;
+            padding-bottom: 10px;
+        }
+
+        .order-form {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            border-left: 5px solid #3498db;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus, .form-group select:focus {
+            outline: none;
+            border-color: #3498db;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(39, 174, 96, 0.4);
+        }
+
+        .orders-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .orders-table th {
+            background: linear-gradient(135deg, #34495e 0%, #2c3e50 100%);
+            color: white;
+            padding: 15px;
+            text-align: left;
+            font-weight: bold;
+        }
+
+        .orders-table td {
+            padding: 15px;
+            border-bottom: 1px solid #ecf0f1;
+        }
+
+        .orders-table tr:hover {
+            background: #f8f9fa;
+        }
+
+        .price {
+            font-weight: bold;
+            color: #e74c3c;
+        }
+
+        .delete-btn {
+            background: #e74c3c;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        .delete-btn:hover {
+            background: #c0392b;
+        }
+
+        @media (max-width: 768px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+            
+            .orders-table {
+                font-size: 14px;
+            }
+            
+            .orders-table th, .orders-table td {
+                padding: 10px 5px;
+            }
+        }
+    </style>
 </head>
 <body>
-    <h1>Hello, World!</h1>
+    <div class="container">
+        <div class="header">
+            <h1>🖥️ 電腦銷售管理系統</h1>
+            <p>專業的電腦設備銷售與管理平台</p>
+        </div>
+
+        <div class="dashboard">
+            <!-- 總營業額顯示 -->
+            <div class="stats-card">
+                <h2>📊 總營業額</h2>
+                <div class="total-amount" id="totalRevenue">NT$ 0</div>
+                <p>累計銷售金額</p>
+            </div>
+
+            <!-- 新增訂單表單 -->
+            <div class="orders-section">
+                <h2 class="section-title">➕ 新增訂單</h2>
+                <div class="order-form">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="customerName">購買人姓名</label>
+                            <input type="text" id="customerName" placeholder="請輸入購買人姓名" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="orderDate">購買日期</label>
+                            <input type="date" id="orderDate" required>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="computerSpec">電腦規格</label>
+                            <select id="computerSpec" required>
+                                <option value="">請選擇電腦規格</option>
+                                <option value="Intel i5-12400 + RTX 3060">Intel i5-12400 + RTX 3060</option>
+                                <option value="Intel i7-12700K + RTX 3070">Intel i7-12700K + RTX 3070</option>
+                                <option value="Intel i9-12900K + RTX 3080">Intel i9-12900K + RTX 3080</option>
+                                <option value="AMD Ryzen 5 5600X + RTX 3060 Ti">AMD Ryzen 5 5600X + RTX 3060 Ti</option>
+                                <option value="AMD Ryzen 7 5800X + RTX 3070 Ti">AMD Ryzen 7 5800X + RTX 3070 Ti</option>
+                                <option value="AMD Ryzen 9 5900X + RTX 3080 Ti">AMD Ryzen 9 5900X + RTX 3080 Ti</option>
+                                <option value="MacBook Air M2">MacBook Air M2</option>
+                                <option value="MacBook Pro M2">MacBook Pro M2</option>
+                                <option value="自訂規格">自訂規格</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="price">價格 (NT$)</label>
+                            <input type="number" id="price" placeholder="請輸入價格" min="0" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="orderTime">訂購時間</label>
+                        <input type="datetime-local" id="orderTime" required>
+                    </div>
+                    <button type="button" class="btn" onclick="addOrder()">新增訂單</button>
+                </div>
+            </div>
+
+            <!-- 訂單列表 -->
+            <div class="orders-section">
+                <h2 class="section-title">📋 訂單記錄</h2>
+                <table class="orders-table">
+                    <thead>
+                        <tr>
+                            <th>訂單編號</th>
+                            <th>購買人</th>
+                            <th>購買日期</th>
+                            <th>電腦規格</th>
+                            <th>訂購時間</th>
+                            <th>價格</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="ordersTableBody">
+                        <!-- 示例數據 -->
+                        <tr>
+                            <td>#001</td>
+                            <td>張小明</td>
+                            <td>2025-07-30</td>
+                            <td>Intel i7-12700K + RTX 3070</td>
+                            <td>2025-07-30 14:30</td>
+                            <td class="price">NT$ 45,000</td>
+                            <td><button class="delete-btn" onclick="deleteOrder(this)">刪除</button></td>
+                        </tr>
+                        <tr>
+                            <td>#002</td>
+                            <td>李小華</td>
+                            <td>2025-07-30</td>
+                            <td>AMD Ryzen 5 5600X + RTX 3060 Ti</td>
+                            <td>2025-07-30 16:45</td>
+                            <td class="price">NT$ 38,000</td>
+                            <td><button class="delete-btn" onclick="deleteOrder(this)">刪除</button></td>
+                        </tr>
+                        <tr>
+                            <td>#003</td>
+                            <td>王大偉</td>
+                            <td>2025-07-31</td>
+                            <td>MacBook Pro M2</td>
+                            <td>2025-07-31 10:15</td>
+                            <td class="price">NT$ 65,000</td>
+                            <td><button class="delete-btn" onclick="deleteOrder(this)">刪除</button></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let orderCounter = 4; // 從第4筆開始，因為已有3筆示例數據
+        let orders = [
+            { id: '#001', customer: '張小明', date: '2025-07-30', spec: 'Intel i7-12700K + RTX 3070', time: '2025-07-30 14:30', price: 45000 },
+            { id: '#002', customer: '李小華', date: '2025-07-30', spec: 'AMD Ryzen 5 5600X + RTX 3060 Ti', time: '2025-07-30 16:45', price: 38000 },
+            { id: '#003', customer: '王大偉', date: '2025-07-31', spec: 'MacBook Pro M2', time: '2025-07-31 10:15', price: 65000 }
+        ];
+
+        // 設定今天的日期和時間為預設值
+        function setDefaultDateTime() {
+            const now = new Date();
+            const today = now.toISOString().split('T')[0];
+            const currentDateTime = now.toISOString().slice(0, 16);
+            
+            document.getElementById('orderDate').value = today;
+            document.getElementById('orderTime').value = currentDateTime;
+        }
+
+        // 計算並更新總營業額
+        function updateTotalRevenue() {
+            const total = orders.reduce((sum, order) => sum + order.price, 0);
+            document.getElementById('totalRevenue').textContent = `NT$ ${total.toLocaleString()}`;
+        }
+
+        // 新增訂單
+        function addOrder() {
+            const customerName = document.getElementById('customerName').value;
+            const orderDate = document.getElementById('orderDate').value;
+            const computerSpec = document.getElementById('computerSpec').value;
+            const price = parseInt(document.getElementById('price').value);
+            const orderTime = document.getElementById('orderTime').value;
+
+            // 驗證輸入
+            if (!customerName || !orderDate || !computerSpec || !price || !orderTime) {
+                alert('請填寫所有必填欄位！');
+                return;
+            }
+
+            // 格式化時間顯示
+            const formattedTime = new Date(orderTime).toLocaleString('zh-TW', {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit',
+                hour12: false
+            });
+
+            // 建立新訂單
+            const newOrder = {
+                id: `#${orderCounter.toString().padStart(3, '0')}`,
+                customer: customerName,
+                date: orderDate,
+                spec: computerSpec,
+                time: formattedTime,
+                price: price
+            };
+
+            orders.push(newOrder);
+            orderCounter++;
+
+            // 添加到表格
+            const tableBody = document.getElementById('ordersTableBody');
+            const newRow = tableBody.insertRow();
+            newRow.innerHTML = `
+                <td>${newOrder.id}</td>
+                <td>${newOrder.customer}</td>
+                <td>${newOrder.date}</td>
+                <td>${newOrder.spec}</td>
+                <td>${newOrder.time}</td>
+                <td class="price">NT$ ${newOrder.price.toLocaleString()}</td>
+                <td><button class="delete-btn" onclick="deleteOrder(this)">刪除</button></td>
+            `;
+
+            // 清空表單
+            document.getElementById('customerName').value = '';
+            document.getElementById('computerSpec').value = '';
+            document.getElementById('price').value = '';
+            setDefaultDateTime(); // 重設日期時間為當前
+
+            // 更新總營業額
+            updateTotalRevenue();
+
+            alert('訂單新增成功！');
+        }
+
+        // 刪除訂單
+        function deleteOrder(button) {
+            if (confirm('確定要刪除這筆訂單嗎？')) {
+                const row = button.closest('tr');
+                const orderId = row.cells[0].textContent;
+                
+                // 從陣列中移除
+                orders = orders.filter(order => order.id !== orderId);
+                
+                // 從表格中移除
+                row.remove();
+                
+                // 更新總營業額
+                updateTotalRevenue();
+                
+                alert('訂單已刪除！');
+            }
+        }
+
+        // 頁面載入時初始化
+        window.onload = function() {
+            setDefaultDateTime();
+            updateTotalRevenue();
+        };
+    </script>
 </body>
 </html>
